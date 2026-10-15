@@ -1,0 +1,22 @@
+# secrets
+.env
+.env.*
+!.env.example
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+# runtime data
+data/
+eval/eval.db
+*.db
+# playwright / test artefacts
+test-results/
+playwright-report/
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

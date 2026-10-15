@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CreatorOS</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f5b942'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' font-family='sans-serif' font-weight='700' fill='%23131416'%3EC%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0f1115;--bg2:#161920;--bg3:#1d2129;--line:#272c36;--text:#e8eaf0;--muted:#8b93a7;--accent:#f5b942;--accent2:#5ad1a5;
+  --danger:#ff6b6b;--info:#6ea8ff;--radius:12px;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5}
+a{color:var(--info);text-decoration:none}
+button{font:inherit;cursor:pointer}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+nav{background:var(--bg2);border-right:1px solid var(--line);padding:20px 14px;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;padding:4px 8px 18px}
+.logo b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#131416}
+nav a.item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted);font-weight:500}
+nav a.item.active,nav a.item:hover{background:var(--bg3);color:var(--text)}
+nav .foot{position:absolute;bottom:18px;left:14px;right:14px;font-size:12px;color:var(--muted)}
+main{padding:28px 36px;max-width:1240px}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--muted);margin:0 0 22px}
+.grid{display:grid;gap:16px}
+.cols-2{grid-template-columns:1fr 1fr}.cols-3{grid-template-columns:repeat(3,1fr)}.cols-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em}.stat .l{color:var(--muted);font-size:13px}
+.stat .d{font-size:12px;color:var(--accent2)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.btn{background:var(--bg3);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:#131416;border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit}
+textarea{min-height:110px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--bg3);color:var(--muted);border:1px solid var(--line)}
+.pill.ready{color:var(--accent2);border-color:#2b4a3f}.pill.published{color:var(--accent);border-color:#4a3f1f}
+.pill.scheduled{color:var(--info);border-color:#2c3d5c}.pill.failed{color:var(--danger)}.pill.generating{color:#c7a1ff}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.link:hover td{background:var(--bg3);cursor:pointer}
+.mono{font-family:var(--mono);font-size:12.5px}
+pre.text{white-space:pre-wrap;font-family:var(--sans);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0;line-height:1.55}
+.muted{color:var(--muted)}.small{font-size:13px}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline > li{display:grid;grid-template-columns:110px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.timeline > li:last-child{border-bottom:0}
+.agent{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.agent.strategist{color:#c7a1ff}.agent.writer{color:var(--info)}.agent.editor{color:var(--danger)}.agent.visual{color:#ff9f6b}
+.agent.learner{color:var(--accent2)}.agent.evaluator{color:var(--accent)}.agent.publisher,.agent.scheduler,.agent.feedback,.agent.brand{color:var(--muted)}
+.reason{color:var(--muted);font-size:13px;margin-top:3px}
+details{margin-top:6px}summary{cursor:pointer;color:var(--muted);font-size:13px}
+.score{font-family:var(--mono);font-weight:700}
+.bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent2)}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--bg3);border:1px solid var(--line);padding:12px 16px;border-radius:10px;max-width:420px;box-shadow:0 10px 30px #0008;z-index:9}
+.toast.err{border-color:var(--danger)}
+.img{width:100%;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.chips span{display:inline-block;margin:0 6px 6px 0;padding:3px 9px;border-radius:6px;background:var(--bg3);font-size:12px}
+.diff ins{background:#1f3b2c;color:#9fe0bb;text-decoration:none}.diff del{background:#3b1f1f;color:#ffb3b3}
+.empty{padding:36px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--muted);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.plat{display:inline-flex;gap:6px;align-items:center}
+.check label{display:inline-flex;align-items:center;gap:6px;margin:0 14px 0 0;color:var(--text)}
+.check input{width:auto}
+.strip{display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative;padding-top:22px}
+.strip .node{display:flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--muted);font-weight:600;font-size:13px;position:relative}
+.strip .node.done{color:var(--text);border-color:#2b4a3f}.strip .node.done::after{content:"✓";color:var(--accent2);font-size:11px}
+.strip .node.active{color:var(--text);border-color:var(--accent);box-shadow:0 0 0 3px #f5b94226}
+.strip .node.active .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.strip .arrow{color:var(--line);font-size:14px}
+.strip .loop{position:absolute;top:0;left:120px;font-family:var(--mono);font-size:11px;color:var(--danger);border:1px dashed #5a2b2b;border-radius:999px;padding:1px 8px;background:var(--bg2)}
+.strip .node .round{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font-size:10px;padding:0 6px;border-radius:999px;white-space:nowrap}
+.log{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;max-height:380px;overflow:auto}
+.log div{padding:3px 0}.log .t{color:var(--muted)}.log .a{font-weight:700;margin:0 6px}.log .m{display:inline-block;margin:2px 0 0 0;padding:1px 7px;border-radius:5px;background:var(--bg3);color:var(--muted);font-size:11px}
+/* platform previews */
+.pv{background:#fff;color:#191919;border-radius:12px;padding:14px 16px;font-family:var(--sans);border:1px solid #e3e5ea}
+.pv .hd{display:flex;gap:10px;align-items:center;margin-bottom:10px}.pv .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:#0a66c2}
+.pv .nm{font-weight:700;font-size:14px}.pv .meta{font-size:12px;color:#666}
+.pv .body{white-space:pre-wrap;font-size:14px;line-height:1.45}.pv .more{color:#666;cursor:pointer;font-weight:600}
+.pv .tags{color:#0a66c2;font-size:13px;margin-top:8px}.pv .bar{display:flex;gap:18px;margin-top:12px;padding-top:10px;border-top:1px solid #e9e9e9;color:#666;font-size:13px}
+.pv.x{border-radius:16px}.pv.x .av{background:#000;border-radius:50%}.pv.x .count{font-size:12px;color:#666;text-align:right}
+.pv .pvimg{width:100%;border-radius:8px;margin-top:10px;border:1px solid #eee}
+.car{position:relative;background:#fff;border-radius:12px;border:1px solid #e3e5ea;overflow:hidden;color:#191919}
+.car .slide{display:none;aspect-ratio:1/1;padding:28px;box-sizing:border-box;color:#fff;background:linear-gradient(160deg,#2b1a05,#8a4a12);font-size:22px;font-weight:700;line-height:1.3;position:relative}
+.car .slide.on{display:flex;align-items:flex-end}.car .slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.car .slide .n{position:absolute;top:14px;right:16px;font-size:12px;font-family:var(--mono);background:#0006;padding:2px 8px;border-radius:999px}
+.car .nav{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:13px;color:#666}
+.car .dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#ccc;margin:0 2px}.car .dots span.on{background:#0a66c2}
+.car .cap{padding:12px 16px;white-space:pre-wrap;font-size:13px;line-height:1.45;border-top:1px solid #eee}
+.car .nav button{background:none;border:1px solid #ddd;border-radius:6px;padding:3px 10px;color:#333}
+.article{background:#fff;color:#1a1a1a;border-radius:12px;padding:28px 32px;font-family:Georgia,serif;line-height:1.65}
+.article h1{font-size:28px;margin:0 0 14px;font-family:var(--sans)}.article h2{font-size:20px;margin:22px 0 8px;font-family:var(--sans)}.article p{margin:0 0 14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.seg button{background:transparent;border:0;color:var(--muted);padding:5px 12px;font-size:13px}.seg button.on{background:var(--bg3);color:var(--text)}
+/* replay */
+.replay{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.replay .prog{flex:1;min-width:120px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}.replay .prog i{display:block;height:100%;background:var(--accent)}
+.stage{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px;min-height:120px}
+.stage .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kv div{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px}.kv b{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+@media(max-width:900px){.app{grid-template-columns:1fr}nav{position:static;height:auto}.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}main{padding:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav>
+    <div class="logo"><b>C</b> CreatorOS</div>
+    <a class="item" href="#/dashboard" data-nav="dashboard">▦ Dashboard</a>
+    <a class="item" href="#/new" data-nav="new">✎ New brief</a>
+    <a class="item" href="#/content" data-nav="content">☰ Content</a>
+    <a class="item" href="#/brands" data-nav="brands">◐ Brand voices</a>
+    <a class="item" href="#/learnings" data-nav="learnings">↻ Learnings</a>
+    <a class="item" href="#/decisions" data-nav="decisions">☷ Decision trail</a>
+    <div class="foot" id="foot">—</div>
+  </nav>
+  <main id="view"></main>
+</div>
+<div id="toast" class="toast" style="display:none"></div>
+
+<script>
+// ------------------------------------------------------------------ utils
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = d => d ? new Date(d).toLocaleString() : '—';
+const num = (v, d=1) => (v === null || v === undefined) ? '—' : Number(v).toFixed(d);
+let toastT;
+function toast(msg, err=false){ const t=$('#toast'); t.textContent=msg; t.className='toast'+(err?' err':''); t.style.display='block'; clearTimeout(toastT); toastT=setTimeout(()=>t.style.display='none', err?6000:3500); }
+async function api(path, opts={}){
+  const r = await fetch('/api'+path, {headers:{'Content-Type':'application/json'}, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined});
+  if(!r.ok){ let m; try{ m=(await r.json()).detail }catch{ m=r.statusText } throw new Error(typeof m==='string'?m:JSON.stringify(m)); }
+  return r.json();
+}
+const statusPill = s => { const k = s.split(':')[0]; const busy = k==='generating'||k==='scoring'; return `<span class="pill ${busy?'generating':k}">${busy?'<span class="spinner"></span> ':''}${esc(s)}</span>`; };
+const PLAT = {linkedin:'LinkedIn', x:'X', instagram:'Instagram', blog:'Blog'};
+function diffWords(a, b){ // tiny LCS word diff for the before/after view
+  const A=a.split(/(\s+)/), B=b.split(/(\s+)/), n=A.length, m=B.length;
+  const L=Array.from({length:n+1},()=>new Uint16Array(m+1));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  let i=0,j=0,out='';
+  while(i<n&&j<m){ if(A[i]===B[j]){out+=esc(A[i]);i++;j++;} else if(L[i+1][j]>=L[i][j+1]){out+=`<del>${esc(A[i])}</del>`;i++;} else {out+=`<ins>${esc(B[j])}</ins>`;j++;} }
+  while(i<n)out+=`<del>${esc(A[i++])}</del>`; while(j<m)out+=`<ins>${esc(B[j++])}</ins>`;
+  return out;
+}
+
+// ------------------------------------------------------------------ router
+const routes = {};
+function nav(){
+  const hash = location.hash || '#/dashboard';
+  const [path, ...rest] = hash.slice(2).split('/');
+  document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active', a.dataset.nav===path));
+  (routes[path] || routes.dashboard)(rest);
+}
+window.addEventListener('hashchange', nav);
+
+// --------------------------------------------------------------- dashboard
+routes.dashboard = async () => {
+  const v=$('#view'); v.innerHTML='<h1>Dashboard</h1><p class="sub">The loop at a glance: generate → edit → publish → measure → learn.</p><div class="spinner"></div>';
+  const [s, recent, brands] = await Promise.all([api('/stats'), api('/content?limit=8'), api('/brands')]);
+  const delta = (s.avg_quality_before!=null) ? (s.avg_quality_after - s.avg_quality_before) : null;
+  v.innerHTML = `
+  <div class="row spread"><div><h1>Dashboard</h1><p class="sub">The loop at a glance: generate → edit → publish → measure → learn.</p></div>
+    <div class="row">${brands.length? '' : '<button class="btn" id="seed">Seed demo brands</button>'}<a class="btn primary" href="#/new">New brief</a></div></div>
+  <div class="grid cols-4">
+    <div class="card stat"><div class="v" data-testid="stat-pieces">${s.pieces}</div><div class="l">Content pieces</div><div class="d">${s.published} published · ${s.scheduled} scheduled</div></div>
+    <div class="card stat"><div class="v">${num(s.avg_quality_after)}</div><div class="l">Avg quality after editor (CQS 0-100)</div><div class="d">${delta==null?'no scored pieces yet':`${delta>=0?'+':''}${num(delta)} vs first draft · editor improved ${Math.round((s.editor_improved_share||0)*100)}% of pieces`}</div></div>
+    <div class="card stat"><div class="v">${s.active_learnings}</div><div class="l">Active learnings</div><div class="d">${s.with_performance} pieces with performance data</div></div>
+    <div class="card stat"><div class="v">${s.decisions}</div><div class="l">Logged decisions</div><div class="d">${s.brands} brand voice${s.brands===1?'':'s'}</div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="row spread"><h2>Recent pieces</h2><a href="#/content" class="small">All content →</a></div>
+  ${recent.length? contentTable(recent) : '<div class="empty">No content yet. Create a brand voice, then a brief.</div>'}</div>`;
+  $('#seed')?.addEventListener('click', async e=>{ e.target.disabled=true; e.target.innerHTML='<span class="spinner"></span> learning voices…'; try{ await api('/demo/seed',{method:'POST'}); toast('Demo brands created'); nav(); }catch(err){ toast(err.message,true); e.target.disabled=false; e.target.textContent='Seed demo brands'; } });
+  bindRows();
+};
+function contentTable(list){
+  return `<table data-testid="content-table"><thead><tr><th>Brief</th><th>Platform</th><th>Status</th><th>Editor</th><th>Quality</th><th>Engagement</th><th>Created</th></tr></thead><tbody>
+  ${list.map(p=>`<tr class="link" data-href="#/content/${p.id}"><td><strong>${esc(p.brief.slice(0,70))}${p.brief.length>70?'…':''}</strong><div class="small muted">${esc(p.strategy?.angle||'')}</div></td>
+    <td>${PLAT[p.platform]||p.platform}</td><td>${statusPill(p.status)}</td>
+    <td class="mono">${p.editor_rounds? `${p.editor_rounds} rounds · ${num(p.final_editor_score)}/10`:'—'}</td>
+    <td class="mono">${p.quality_before!=null? `${num(p.quality_before)} → <b>${num(p.quality_after)}</b>`:'—'}</td>
+    <td class="mono">${p.latest_engagement!=null? num(p.latest_engagement,2):'—'}</td><td class="small muted">${fmt(p.created_at)}</td></tr>`).join('')}</tbody></table>`;
+}
+function bindRows(){ document.querySelectorAll('tr.link').forEach(r=>r.addEventListener('click',()=>location.hash=r.dataset.href)); }
+
+// ----------------------------------------------------------------- content
+routes.content = async (rest) => {
+  if(rest[0]) return contentDetail(rest[0]);
+  const v=$('#view'); v.innerHTML='<h1>Content</h1><div class="spinner"></div>';
+  const list = await api('/content?limit=200');
+  v.innerHTML = `<div class="row spread"><div><h1>Content</h1><p class="sub">${list.length} pieces</p></div><a class="btn primary" href="#/new">New brief</a></div>
+    <div class="card">${list.length?contentTable(list):'<div class="empty">Nothing yet.</div>'}</div>`;
+  bindRows();
+  if(list.some(p=>p.status.startsWith('generating')||p.status==='scoring')) setTimeout(()=>{ if(location.hash==='#/content') routes.content([]); }, 3000);
+};
+
+const R = {id:null, i:0, playing:false, speed:1, timer:null};  // replay state
+async function contentDetail(id){
+  const v=$('#view');
+  let p; try{ p = await api('/content/'+id); }catch(e){ v.innerHTML=`<div class="empty">${esc(e.message)}</div>`; return; }
+  const brand = await api('/brands/'+p.brand_id);
+  if(R.id!==id){ clearInterval(R.timer); Object.assign(R,{id, i:0, playing:false, timer:null}); }
+  renderDetail(id, p, brand);
+}
+function renderDetail(id, p, brand){
+  const v=$('#view');
+  const first = p.versions[0], last = p.versions[p.versions.length-1];
+  const generating = p.status.startsWith('generating') || p.status==='scoring';
+  const stage = p.status.split(':')[1] || (p.status==='scoring'?'scoring':null);
+  const replaying = R.playing || (R.i>0 && R.i<p.decisions.length);
+  const shown = replaying ? p.decisions.slice(0, R.i) : p.decisions;
+  const curDec = replaying ? p.decisions[R.i-1] : null;
+  const pvMode = localStorage.getItem('pv') || 'preview';
+  v.innerHTML = `
+  <a href="#/content" class="small">← Content</a>
+  <div class="row spread" style="margin-top:6px"><div><h1 data-testid="detail-brief">${esc(p.brief)}</h1>
+    <p class="sub">${PLAT[p.platform]||p.platform} · ${esc(brand.name)} · ${statusPill(p.status)} ${p.campaign_id?`· campaign <span class="mono">${p.campaign_id}</span>`:''}</p></div>
+    <div class="row">
+      ${['ready','scheduled','failed'].includes(p.status)? `<button class="btn" id="btn-schedule">Schedule</button><button class="btn primary" id="btn-publish" data-testid="btn-publish">Publish now</button>`:''}
+      ${p.status==='published'? `<button class="btn" id="btn-feedback" data-testid="btn-feedback">Record performance</button>`:''}
+      <button class="btn ghost" id="btn-regen">Regenerate with current learnings</button>
+    </div></div>
+  ${p.error? `<div class="card" style="border-color:var(--danger)"><b>Error:</b> ${esc(p.error)}</div>`:''}
+  <div class="card" style="margin-top:8px">
+    ${!generating && p.decisions.length? `<div class="replay" data-testid="replay">
+      <button class="btn sm ${R.playing?'':'primary'}" id="rp-play" data-testid="rp-play">${R.playing?'⏸ Pause':(R.i>=p.decisions.length||R.i===0?'▶ Replay':'▶ Play')}</button>
+      <button class="btn sm" id="rp-next" data-testid="rp-next">⏭ Next</button>
+      <button class="btn sm ghost" id="rp-reset">↺ Reset</button>
+      <span class="seg"><button id="rp-1x" class="${R.speed===1?'on':''}">1x</button><button id="rp-2x" class="${R.speed===2?'on':''}">2x</button></span>
+      <span class="prog"><i style="width:${Math.round(100*(replaying?R.i:p.decisions.length)/p.decisions.length)}%"></i></span>
+      <span class="mono small muted">${replaying?`step ${R.i}/${p.decisions.length}`:'full run'}</span></div>`:''}
+    ${pipelineStrip({...p, decisions: shown}, replaying ? (curDec?.agent==='evaluator'?'scoring':curDec?.agent) : stage, generating || replaying, replaying)}
+    ${curDec? `<div class="stage" style="margin-top:12px" data-testid="stage-panel">${stagePanel(curDec, p)}</div>`:''}
+  </div>
+  <div class="grid cols-3" style="margin-top:16px">
+    <div class="card stat"><div class="v">${p.editor_rounds||0}</div><div class="l">Editor rounds</div><div class="d">final editor score ${num(p.final_editor_score)}/10</div></div>
+    <div class="card stat"><div class="v" data-testid="quality-after">${num(p.quality_after)}</div><div class="l">Quality after editor (CQS)</div><div class="d">first draft ${num(p.quality_before)} → ${p.quality_before!=null?((p.quality_after-p.quality_before)>=0?'+':'')+num(p.quality_after-p.quality_before):'—'}</div></div>
+    <div class="card stat"><div class="v">${p.performance.length? num(p.performance[p.performance.length-1].engagement_score,2):'—'}</div><div class="l">Engagement score</div><div class="d">${p.performance.length? `${p.performance.length} record(s) · ${p.performance[p.performance.length-1].source}`:'not published / no data yet'}</div></div>
+  </div>
+  <div class="grid cols-2" style="margin-top:16px">
+    <div>
+      <div class="card"><div class="row spread"><h2>Final piece</h2><span class="seg"><button id="pv-preview" class="${pvMode==='preview'?'on':''}" data-testid="pv-preview">${PLAT[p.platform]||'Platform'} preview</button><button id="pv-raw" class="${pvMode==='raw'?'on':''}" data-testid="pv-raw">Raw text</button></span></div>
+        ${pvMode==='preview' && p.final_text ? platformPreview(p, brand) : `<pre class="text" data-testid="final-text">${esc(p.final_text||'(not ready)')}</pre>`}
+        ${pvMode==='preview' && p.final_text ? `<pre class="text" data-testid="final-text" style="display:none">${esc(p.final_text)}</pre>`:''}
+        <div class="chips" style="margin-top:10px">${(p.hashtags||[]).map(h=>`<span>${esc(h)}</span>`).join('')}</div>
+        ${p.scheduled_at?`<div class="small muted" style="margin-top:8px">Scheduled: ${fmt(p.scheduled_at)} via ${esc(p.publish_target)}</div>`:''}
+        ${p.published_at?`<div class="small muted">Published: ${fmt(p.published_at)} ${p.external_url?`· <a href="${esc(p.external_url)}" target="_blank">open</a>`:''}</div>`:''}
+      </div>
+      ${p.versions.length>1? `<div class="card" style="margin-top:16px"><h2>What the editor changed</h2><p class="small muted">Word-level diff: first draft → final draft.</p><pre class="text diff" data-testid="diff">${diffWords(first.text,last.text)}</pre></div>`:''}
+      <div class="card" style="margin-top:16px"><h2>Versions</h2>
+        ${p.versions.map(ver=>`<details ${ver.version===p.versions.length?'open':''}><summary>v${ver.version} · ${ver.source} · ${ver.text.length} chars ${ver.editor_score!=null?`· previous editor score ${num(ver.editor_score)}`:''} ${ver.quality_score!=null?`· CQS ${num(ver.quality_score)}`:''}</summary><pre class="text" style="margin-top:8px">${esc(ver.text)}</pre></details>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="card"><h2>Strategy</h2>
+        ${p.strategy?.angle? `<div><b>Angle:</b> ${esc(p.strategy.angle)}</div><div><b>Hook (${esc(p.strategy.hook_type||'')}):</b> ${esc(p.strategy.hook)}</div><div><b>Audience:</b> ${esc(p.strategy.audience)}</div><div><b>CTA:</b> ${esc(p.strategy.cta)}</div>
+          <ul class="small">${(p.strategy.key_points||[]).map(k=>`<li>${esc(k)}</li>`).join('')}</ul>
+          ${(p.learnings_applied||[]).length? `<div class="small" style="color:var(--accent2)">↻ ${p.learnings_applied.length} performance learning(s) injected into this run</div>`:'<div class="small muted">No performance learnings existed when this ran.</div>'}`:'<span class="muted">pending…</span>'}
+      </div>
+      <div class="card" style="margin-top:16px"><h2>Visual</h2>
+        ${p.image_url? `<img class="img" src="${p.image_url}?v=${Date.parse(p.updated_at)||0}" alt="${esc(p.alt_text||'')}" data-testid="image">`:`<div class="muted small">${generating?'Waiting for the visual agent…':'No visual yet.'}</div>`}
+        ${(()=>{ const vd=p.decisions.find(d=>d.decision_type==='image_concept'); if(!vd) return ''; const pl=vd.payload||{}; return `<div class="small" style="margin-top:8px">${pl.image_model_used?'<span style="color:var(--accent2)">● background by Mesh image model</span>':`<span style="color:var(--danger)">● image model ${pl.error?'failed':'skipped'}</span> — procedural background used`}${pl.error?`<div class="mono muted" style="margin-top:4px">${esc(pl.error)}</div>`:''}</div>`; })()}
+        ${p.image_prompt? `<details><summary>Image prompt &amp; headline</summary><div class="small" style="margin-top:6px"><b>Prompt:</b> ${esc(p.image_prompt)}</div></details>`:''}
+      </div>
+      <div class="card" style="margin-top:16px"><div class="row spread"><h2>Agent log</h2><span class="mono small muted" data-testid="llm-totals">${llmTotals(shown)}</span></div>${agentLog(shown)}</div>
+      <div class="card" style="margin-top:16px"><h2>Decision trail</h2>${timeline(shown)}</div>
+      ${p.performance.length? `<div class="card" style="margin-top:16px"><h2>Performance</h2><table><thead><tr><th>Source</th><th>Impr.</th><th>Likes</th><th>Comments</th><th>Shares</th><th>Score</th></tr></thead><tbody>
+        ${p.performance.map(x=>`<tr><td>${esc(x.source)}</td><td>${x.impressions}</td><td>${x.likes}</td><td>${x.comments}</td><td>${x.shares}</td><td class="score">${num(x.engagement_score,2)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    </div>
+  </div>
+  <div id="modal"></div>`;
+  // --- replay controls
+  const rerender=()=>renderDetail(id,p,brand);
+  const stopTimer=()=>{ clearInterval(R.timer); R.timer=null; R.playing=false; };
+  const tick=()=>{ if(R.i>=p.decisions.length){ stopTimer(); rerender(); return; } R.i++; rerender(); };
+  const startTimer=()=>{ stopTimer(); R.playing=true; if(R.i>=p.decisions.length) R.i=0; R.timer=setInterval(tick, 1800/R.speed); tick(); };
+  $('#rp-play')?.addEventListener('click', ()=>{ if(R.playing){ stopTimer(); rerender(); } else startTimer(); });
+  $('#rp-next')?.addEventListener('click', ()=>{ stopTimer(); if(R.i>=p.decisions.length) R.i=0; R.i++; rerender(); });
+  $('#rp-reset')?.addEventListener('click', ()=>{ stopTimer(); R.i=0; rerender(); });
+  $('#rp-1x')?.addEventListener('click', ()=>{ R.speed=1; if(R.playing) startTimer(); else rerender(); });
+  $('#rp-2x')?.addEventListener('click', ()=>{ R.speed=2; if(R.playing) startTimer(); else rerender(); });
+  $('#pv-preview')?.addEventListener('click', ()=>{ localStorage.setItem('pv','preview'); rerender(); });
+  $('#pv-raw')?.addEventListener('click', ()=>{ localStorage.setItem('pv','raw'); rerender(); });
+  bindPreview();
+  // --- actions
+  $('#btn-publish')?.addEventListener('click', async e=>{ e.target.disabled=true; try{ await api(`/content/${id}/publish`,{method:'POST'}); toast('Published'); contentDetail(id);}catch(err){toast(err.message,true); e.target.disabled=false;} });
+  $('#btn-schedule')?.addEventListener('click', async ()=>{
+    let rec=null; try{ rec = await api(`/content/${id}/best-slot`); }catch{}
+    const d = rec? new Date(rec.scheduled_at) : new Date(Date.now()+5*60000); d.setSeconds(0,0);
+    $('#modal').innerHTML = `<div class="card" style="margin-top:16px;max-width:620px"><h2>Schedule</h2>
+      ${rec? `<div class="small" style="padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)"><b style="color:var(--accent2)">Recommended slot:</b> ${d.toLocaleString()} <span class="pill">${esc(rec.basis==='performance'?'from performance':'platform default')}</span><div class="reason" data-testid="slot-reason">Why: ${esc(rec.reason)}</div></div>`:''}
+      <label>Publish at (local time)</label><input type="datetime-local" id="sched-at" value="${new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}">
+      <label>Target</label><select id="sched-target"><option value="simulated">Simulated (no credentials)</option><option value="x">X / Twitter API (needs X_* keys)</option></select>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="sched-ok" data-testid="btn-schedule-ok">Queue it</button><button class="btn ghost" onclick="document.getElementById('modal').innerHTML=''">Cancel</button></div></div>`;
+    $('#modal').scrollIntoView({behavior:'smooth'});
+    $('#sched-ok').addEventListener('click', async ()=>{ const chosen=new Date($('#sched-at').value); const kept = rec && Math.abs(chosen-d)<60000;
+      try{ await api(`/content/${id}/schedule`,{method:'POST',body:{scheduled_at:chosen.toISOString(), publish_target:$('#sched-target').value, reason: kept? `Accepted recommended slot (${rec.basis}): ${rec.reason}` : (rec? `User overrode the recommended slot (${d.toISOString()}); recommendation was: ${rec.reason}`:'')}}); toast('Queued'); contentDetail(id);}catch(err){toast(err.message,true);} });
+  });
+  $('#btn-feedback')?.addEventListener('click', ()=>{
+    $('#modal').innerHTML = `<div class="card" style="margin-top:16px;max-width:620px"><h2>Record performance</h2><p class="small muted">Enter the real numbers from the platform (or your own estimate). They feed the learning step.</p>
+      <div class="grid cols-3">${['impressions','likes','comments','shares','saves','clicks'].map(k=>`<div><label>${k}</label><input type="number" min="0" id="pf-${k}" value="0" data-testid="pf-${k}"></div>`).join('')}</div>
+      <label>Notes</label><input id="pf-notes" placeholder="e.g. posted at 9am IST">
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="pf-ok" data-testid="btn-feedback-ok">Save</button><button class="btn ghost" onclick="document.getElementById('modal').innerHTML=''">Cancel</button></div></div>`;
+    $('#modal').scrollIntoView({behavior:'smooth'});
+    $('#pf-ok').addEventListener('click', async ()=>{ const body={source:'user',notes:$('#pf-notes').value}; ['impressions','likes','comments','shares','saves','clicks'].forEach(k=>body[k]=Number($('#pf-'+k).value||0));
+      try{ await api(`/content/${id}/performance`,{method:'POST',body}); toast('Performance recorded'); contentDetail(id);}catch(err){toast(err.message,true);} });
+  });
+  $('#btn-regen')?.addEventListener('click', async e=>{ e.target.disabled=true; try{ const n=await api(`/content/${id}/regenerate`,{method:'POST'}); toast('New piece queued'); location.hash='#/content/'+n.id; }catch(err){toast(err.message,true); e.target.disabled=false;} });
+  if(generating) setTimeout(()=>{ if(location.hash==='#/content/'+id) contentDetail(id); }, 2500);
+}
+function initials(n){ return (n||'C').split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function platformPreview(p, brand){
+  const text=p.final_text, tags=(p.hashtags||[]).join(' '), img=p.image_url?`${p.image_url}?v=${Date.parse(p.updated_at)||0}`:null;
+  if(p.platform==='linkedin'){
+    const fold=210, cut=text.length>fold;
+    return `<div class="pv li" data-testid="preview-linkedin"><div class="hd"><div class="av">${esc(initials(brand.name))}</div><div><div class="nm">${esc(brand.name)}</div><div class="meta">${esc((brand.description||'').slice(0,60))}<br>Just now · 🌐</div></div></div>
+      <div class="body"><span class="pv-short">${esc(cut?text.slice(0,fold):text)}${cut?'… <span class="more" data-more>see more</span>':''}</span><span class="pv-full" style="display:none">${esc(text)}</span></div>
+      ${tags?`<div class="tags">${esc(tags)}</div>`:''}${img?`<img class="pvimg" src="${img}" alt="">`:''}
+      <div class="bar"><span>👍 Like</span><span>💬 Comment</span><span>🔁 Repost</span><span>➤ Send</span></div></div>`;
+  }
+  if(p.platform==='x'){
+    const full = tags? text+'\n\n'+tags : text;
+    return `<div class="pv x" data-testid="preview-x"><div class="hd"><div class="av">${esc(initials(brand.name))}</div><div><div class="nm">${esc(brand.name)} <span class="meta">@${esc(brand.name.toLowerCase().replace(/\W+/g,''))} · now</span></div></div></div>
+      <div class="body">${esc(full)}</div>${img?`<img class="pvimg" src="${img}" alt="">`:''}
+      <div class="count" style="color:${full.length>280?'#d33':'#666'}">${full.length} / 280</div>
+      <div class="bar"><span>💬</span><span>🔁</span><span>♥</span><span>👁</span><span>🔖</span></div></div>`;
+  }
+  if(p.platform==='instagram'){
+    const paras=text.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+    const hook = p.strategy?.hook || paras[0] || '';
+    const items=[]; paras.slice(1).forEach(par=>{ const lines=par.split('\n').map(l=>l.trim()).filter(Boolean); if(lines.length>1 && lines.every(l=>/^(\d+[.)]|[-*•])\s/.test(l))) lines.forEach(l=>items.push(l)); else items.push(par); });
+    const slides=[hook, ...items].slice(0,8); if(slides.length<2) slides.push(p.strategy?.cta||'Save this for later');
+    return `<div class="car" data-testid="preview-instagram"><div class="hd" style="display:flex;gap:10px;align-items:center;padding:10px 14px"><div class="av" style="width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)">${esc(initials(brand.name))}</div><b style="font-size:13px">${esc(brand.name.toLowerCase().replace(/\s+/g,'.'))}</b></div>
+      ${slides.map((t,i)=>`<div class="slide ${i===0?'on':''}">${i===0&&img?`<img src="${img}" alt="">`:''}<span class="n">${i+1}/${slides.length}</span>${i===0&&img?'':`<span>${esc(t)}</span>`}</div>`).join('')}
+      <div class="nav"><button data-car="-1">‹</button><span class="dots">${slides.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</span><button data-car="1">›</button></div>
+      <div class="cap"><b>${esc(brand.name.toLowerCase().replace(/\s+/g,'.'))}</b> ${esc(text)}${tags?'\n\n'+esc(tags):''}</div></div>`;
+  }
+  // blog
+  const lines=text.split('\n'); let title=lines[0].replace(/^#+\s*/,''); const body=lines.slice(1).join('\n');
+  const html=body.split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).map(b=>/^#{1,3}\s/.test(b)?`<h2>${esc(b.replace(/^#+\s*/,''))}</h2>`:(b.length<70&&!/[.!?]$/.test(b)?`<h2>${esc(b)}</h2>`:`<p>${esc(b)}</p>`)).join('');
+  return `<div class="article" data-testid="preview-blog">${img?`<img class="pvimg" src="${img}" alt="" style="margin:0 0 18px">`:''}<h1>${esc(title)}</h1><div class="meta" style="color:#777;font-family:var(--sans);font-size:13px;margin-bottom:14px">By ${esc(brand.name)} · ${Math.max(1,Math.round(text.split(/\s+/).length/220))} min read</div>${html}</div>`;
+}
+function bindPreview(){
+  document.querySelectorAll('[data-more]').forEach(m=>m.addEventListener('click', ()=>{ const b=m.closest('.body'); b.querySelector('.pv-short').style.display='none'; b.querySelector('.pv-full').style.display='inline'; }));
+  const car=document.querySelector('.car'); if(!car) return; let i=0; const slides=car.querySelectorAll('.slide'), dots=car.querySelectorAll('.dots span');
+  car.querySelectorAll('[data-car]').forEach(b=>b.addEventListener('click', ()=>{ i=(i+Number(b.dataset.car)+slides.length)%slides.length; slides.forEach((s,k)=>s.classList.toggle('on',k===i)); dots.forEach((d,k)=>d.classList.toggle('on',k===i)); }));
+}
+function stagePanel(d, p){
+  const pl=d.payload||{};
+  const llm=(pl.llm||[]).map(c=>`<span class="m">Mesh API · ${esc(c.model)}${c.prompt_tokens||c.completion_tokens?` · ${((c.prompt_tokens||0)+(c.completion_tokens||0)).toLocaleString()} tok`:''}</span>`).join(' ');
+  const head=`<div class="lbl"><span class="agent ${esc(d.agent)}">${esc(d.agent)}</span> · ${esc(d.decision_type)} ${llm?'&nbsp; '+llm:''}</div>`;
+  if(d.agent==='strategist') return head+`<div class="kv"><div><b>Angle</b>${esc(pl.angle||'')}</div><div><b>Hook</b>${esc(pl.hook||'')}</div><div><b>Audience</b>${esc(pl.audience||'')}</div><div><b>Why</b>${esc(d.reasoning)}</div></div>`;
+  if(d.agent==='writer' && d.decision_type==='draft_written'){ const v=p.versions[0]; return head+`<pre class="text">${esc(v?v.text:'')}</pre>`; }
+  if(d.agent==='writer'){ const n=Number((d.decision_type.match(/\d+/)||[1])[0]); const a=p.versions[n-1], b=p.versions[n]; return head+`<div class="small muted" style="margin-bottom:6px">Changes: ${esc((pl.change_log||[]).join(' · '))}</div><pre class="text diff">${a&&b?diffWords(a.text,b.text):esc(b?b.text:'')}</pre>`; }
+  if(d.agent==='editor') return head+`<div class="row" style="gap:16px;margin-bottom:8px"><span class="score" style="font-size:22px;color:${pl.score>=7.5?'var(--accent2)':'var(--danger)'}">${num(pl.score)}/10</span><span class="mono small muted">${Object.entries(pl.criteria||{}).map(([k,x])=>`${k}=${x}`).join(' · ')}</span></div>${(pl.required_edits||[]).length?`<b class="small">Required edits</b><ol class="small" style="margin:4px 0 8px 18px">${pl.required_edits.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:'<div class="small" style="color:var(--accent2)">Accepted — no edits required.</div>'}<div class="reason">Why: ${esc(d.reasoning)}</div>`;
+  if(d.agent==='visual') return head+`<div class="grid cols-2"><div><div class="small"><b>Prompt:</b> ${esc(pl.image_prompt||'')}</div><div class="small" style="margin-top:6px"><b>Headline:</b> ${esc(pl.headline||'')}<br><b>Subline:</b> ${esc(pl.subline||'')}</div><div class="reason">Why: ${esc(d.reasoning)}</div></div>${p.image_url?`<img class="img" src="${p.image_url}" alt="">`:''}</div>`;
+  if(d.agent==='evaluator') return head+`<div class="row" style="gap:16px"><span class="score" style="font-size:22px">${num(pl.before?.cqs)} → ${num(pl.after?.cqs)}</span><span class="small muted">CQS before → after editor loop</span></div><div class="reason">${esc(d.reasoning)}</div>`;
+  return head+`<div>${esc(d.summary)}</div><div class="reason">${esc(d.reasoning)}</div>`;
+}
+const STAGES=[['strategist','Strategist'],['writer','Writer'],['editor','Editor'],['visual','Visual'],['scoring','Evaluator'],['scheduler','Scheduler']];
+function pipelineStrip(p, stage, generating, replaying){
+  const done = new Set(p.decisions.map(d=>d.agent));
+  if(p.quality_after!=null) done.add('scoring');
+  if(p.status==='scheduled'||p.status==='published') done.add('scheduler');
+  const cur = stage==='revising'?'writer':stage;
+  const rounds = p.decisions.filter(d=>d.agent==='editor').length;
+  return `<div class="strip" data-testid="pipeline"><span class="loop">score &lt; ${7.5} → rewrite ⟲</span>${STAGES.map(([k,l],i)=>`${i?'<span class="arrow">›</span>':''}<span class="node ${generating&&cur===k?'active':done.has(k)?'done':''}" data-stage="${k}">${generating&&cur===k?'<span class="dot"></span>':''}${l}${k==='editor'&&rounds?`<span class="round">round ${rounds}</span>`:''}</span>`).join('')}
+  ${generating?`<span class="small muted" style="margin-left:auto">${replaying?'⏵ replaying · '+esc(stage||''):'<span class="spinner"></span> '+esc(stage||'')+'… refreshing'}</span>`:''}</div>`;
+}
+function llmTotals(decisions){ let calls=0,tok=0; decisions.forEach(d=>(d.payload?.llm||[]).forEach(c=>{calls++;tok+=(c.prompt_tokens||0)+(c.completion_tokens||0);})); return calls? `LLM calls ${calls} · tokens ${(tok/1000).toFixed(1)}k · via Mesh API`:''; }
+function agentLog(decisions){
+  if(!decisions.length) return '<div class="muted small">waiting for agents…</div>';
+  const t0 = Date.parse(decisions[0].created_at);
+  return `<div class="log" data-testid="agent-log">${decisions.map(d=>{ const dt=((Date.parse(d.created_at)-t0)/1000).toFixed(1).padStart(5,'0');
+    const llm=(d.payload?.llm||[]).map(c=>`<span class="m">Mesh API · ${esc(c.model)}${c.prompt_tokens||c.completion_tokens?` · ${((c.prompt_tokens||0)+(c.completion_tokens||0)).toLocaleString()} tok`:''}${c.latency_ms?` · ${(c.latency_ms/1000).toFixed(1)}s`:''}</span>`).join(' ');
+    return `<div><span class="t">[${dt}]</span><span class="a agent ${esc(d.agent)}">${esc(d.agent)}</span>${esc(d.summary.slice(0,150))}${llm?'<br>'+llm:''}</div>`; }).join('')}</div>`;
+}
+function timeline(decisions){
+  if(!decisions.length) return '<div class="muted small">No decisions yet.</div>';
+  return `<ul class="timeline" data-testid="timeline">${decisions.map(d=>`<li><div><div class="agent ${esc(d.agent)}">${esc(d.agent)}</div><div class="small muted">${esc(d.decision_type)}</div><div class="small muted">${new Date(d.created_at).toLocaleTimeString()}</div></div>
+    <div><div>${esc(d.summary)}</div>${d.reasoning?`<div class="reason">Why: ${esc(d.reasoning)}</div>`:''}
+    ${(d.payload?.required_edits?.length)?`<div class="small" style="margin-top:4px"><b>Required edits:</b><ol class="small" style="margin:4px 0 0 18px">${d.payload.required_edits.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:''}
+    ${(d.payload?.change_log?.length)?`<div class="small" style="margin-top:4px"><b>Changes made:</b><ul class="small" style="margin:4px 0 0 18px">${d.payload.change_log.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+    ${(d.payload?.criteria)?`<div class="small mono muted" style="margin-top:4px">${Object.entries(d.payload.criteria).map(([k,x])=>`${k}=${x}`).join(' · ')}</div>`:''}
+    ${(d.payload?.alternatives_rejected?.length)?`<details><summary>Alternatives rejected</summary><ul class="small">${d.payload.alternatives_rejected.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`:''}
+    </div></li>`).join('')}</ul>`;
+}
+
+// --------------------------------------------------------------------- new
+routes.new = async () => {
+  const v=$('#view');
+  const brands = await api('/brands');
+  v.innerHTML = `<h1>New brief</h1><p class="sub">One idea, adapted per platform. Strategist → Writer → Editor loop → Visual, then stored and queued.</p>
+  <div class="card" style="max-width:760px">
+    ${brands.length? '' : '<div class="empty" style="margin-bottom:14px">No brand voices yet — <a href="#/brands">create one</a> or seed the demo brands from the dashboard.</div>'}
+    <label>Brand voice</label><select id="brand" data-testid="brief-brand">${brands.map(b=>`<option value="${b.id}">${esc(b.name)} (${b.sample_count} samples)</option>`).join('')}</select>
+    <label>Brief <a href="#" id="use-example" class="small" style="margin-left:8px">use example brief for this brand</a></label><textarea id="brief" data-testid="brief-text" placeholder="e.g. a LinkedIn post about AI safety for engineering leaders"></textarea>
+    <label>Platforms</label><div class="check">${Object.entries(PLAT).map(([k,l])=>`<label><input type="checkbox" name="plat" value="${k}" ${k==='linkedin'?'checked':''} data-testid="plat-${k}"> ${l}</label>`).join('')}</div>
+    <div class="grid cols-2"><div><label>Schedule (optional)</label><input type="datetime-local" id="sched"></div><div><label>Publish target</label><select id="target"><option value="simulated">Simulated</option><option value="x">X API</option></select></div></div>
+    <div class="check" style="margin-top:12px"><label><input type="checkbox" id="img" checked> Generate image</label><label><input type="checkbox" id="learn" checked> Apply performance learnings</label></div>
+    <div class="row" style="margin-top:16px"><button class="btn primary" id="go" data-testid="brief-submit" ${brands.length?'':'disabled'}>Run the studio</button><span class="small muted" id="hint"></span></div>
+  </div>`;
+  $('#use-example').addEventListener('click', e=>{ e.preventDefault(); const b=brands.find(x=>x.id===$('#brand').value); if(!b||!b.example_brief){ toast('No example for this brand'); return; }
+    $('#brief').value=b.example_brief; document.querySelectorAll('input[name=plat]').forEach(i=>i.checked=b.example_platforms.includes(i.value)); });
+  $('#go').addEventListener('click', async ()=>{
+    const platforms=[...document.querySelectorAll('input[name=plat]:checked')].map(i=>i.value);
+    const brief=$('#brief').value.trim(); if(!brief||!platforms.length){ toast('Brief and at least one platform are required',true); return; }
+    const body={brand_id:$('#brand').value, brief, platforms, generate_image:$('#img').checked, use_learnings:$('#learn').checked, publish_target:$('#target').value};
+    if($('#sched').value) body.scheduled_at=new Date($('#sched').value).toISOString();
+    $('#go').disabled=true; $('#hint').innerHTML='<span class="spinner"></span> agents starting…';
+    try{ const res=await api('/content',{method:'POST',body}); toast(`${res.length} piece(s) queued`); location.hash = res.length===1? '#/content/'+res[0].id : '#/content'; }
+    catch(err){ toast(err.message,true); $('#go').disabled=false; $('#hint').textContent=''; }
+  });
+};
+
+// ------------------------------------------------------------------ brands
+routes.brands = async (rest) => {
+  const v=$('#view'); v.innerHTML='<h1>Brand voices</h1><div class="spinner"></div>';
+  const brands = await api('/brands');
+  v.innerHTML = `<div class="row spread"><div><h1>Brand voices</h1><p class="sub">A profile learned from several real samples, injected into every agent prompt.</p></div><button class="btn primary" id="add">New brand</button></div>
+  <div id="form"></div>
+  <div class="grid cols-2" data-testid="brand-list">${brands.map(b=>`<div class="card"><div class="row spread"><h2 style="margin:0">${esc(b.name)}</h2><span class="pill">${b.sample_count} samples</span></div>
+    <p class="small muted">${esc(b.description)}</p>
+    ${b.profile?.summary? `<p><b>${esc(b.profile.summary)}</b></p><div class="small"><b>Tone:</b> ${esc(b.profile.tone)}<br><b>Sentence style:</b> ${esc(b.profile.sentence_style)}<br><b>Emoji:</b> ${esc(b.profile.emoji_usage)}</div>
+      <div class="chips" style="margin-top:8px">${(b.profile.vocabulary||[]).map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+      <details><summary>Do / Don't / Signature moves</summary><div class="small"><b>Do:</b> ${(b.profile.do||[]).map(esc).join(' · ')}<br><b>Don't:</b> ${(b.profile.dont||[]).map(esc).join(' · ')}<br><b>Moves:</b> ${(b.profile.signature_moves||[]).map(esc).join(' · ')}</div></details>
+      <details><summary>Measured style stats</summary><pre class="text mono" style="margin-top:6px">${esc(JSON.stringify(b.profile_stats,null,1))}</pre></details>`
+      : '<div class="muted small">No profile yet — add at least 2 samples.</div>'}
+    <div class="row" style="margin-top:12px"><button class="btn sm" data-add="${b.id}">Add samples</button><button class="btn sm ghost" data-relearn="${b.id}">Re-learn voice</button><a class="btn sm ghost" href="#/learnings/${b.id}">Learnings</a></div></div>`).join('')}</div>`;
+  $('#add').addEventListener('click', ()=>brandForm());
+  document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>brandForm(b.dataset.add)));
+  document.querySelectorAll('[data-relearn]').forEach(b=>b.addEventListener('click', async ()=>{ b.disabled=true; try{ await api(`/brands/${b.dataset.relearn}/learn-voice`,{method:'POST'}); toast('Voice re-learned'); routes.brands([]);}catch(e){toast(e.message,true); b.disabled=false;} }));
+};
+function brandForm(brandId){
+  $('#form').innerHTML = `<div class="card" style="margin-bottom:16px;max-width:760px"><h2>${brandId?'Add samples':'New brand'}</h2>
+    ${brandId?'':'<label>Name</label><input id="bname" data-testid="brand-name"><label>Description</label><input id="bdesc" data-testid="brand-desc" placeholder="who is speaking, about what, to whom">'}
+    <label>Samples of past content (one per box — at least 2; more is better)</label>
+    <div id="samples">${[0,1,2].map(i=>`<textarea class="sample" data-testid="brand-sample-${i}" placeholder="Paste a past post…" style="margin-bottom:8px"></textarea>`).join('')}</div>
+    <button class="btn sm ghost" id="more">+ another sample</button>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="save" data-testid="brand-save">Learn the voice</button><button class="btn ghost" onclick="document.getElementById('form').innerHTML=''">Cancel</button></div></div>`;
+  $('#more').addEventListener('click', ()=>{ const t=document.createElement('textarea'); t.className='sample'; t.style.marginBottom='8px'; $('#samples').appendChild(t); });
+  $('#save').addEventListener('click', async ()=>{
+    const samples=[...document.querySelectorAll('.sample')].map(t=>t.value.trim()).filter(Boolean).map(text=>({text, platform:'linkedin'}));
+    if(samples.length<2 && !brandId){ toast('Give at least 2 samples so a voice can be learned',true); return; }
+    $('#save').disabled=true; $('#save').innerHTML='<span class="spinner"></span> learning…';
+    try{ if(brandId) await api(`/brands/${brandId}/samples`,{method:'POST',body:{samples,relearn:true}}); else await api('/brands',{method:'POST',body:{name:$('#bname').value,description:$('#bdesc').value,samples}}); toast('Brand voice learned'); routes.brands([]); }
+    catch(e){ toast(e.message,true); $('#save').disabled=false; $('#save').textContent='Learn the voice'; }
+  });
+}
+
+// --------------------------------------------------------------- learnings
+routes.learnings = async (rest) => {
+  const v=$('#view'); v.innerHTML='<h1>Learnings</h1><div class="spinner"></div>';
+  const brands = await api('/brands');
+  if(!brands.length){ v.innerHTML='<h1>Learnings</h1><div class="empty">Create a brand first.</div>'; return; }
+  const bid = rest[0] || brands[0].id;
+  const [learnings, runs] = await Promise.all([api(`/brands/${bid}/learnings?include_inactive=true`), api(`/brands/${bid}/learning-runs`)]);
+  const active = learnings.filter(l=>l.active);
+  v.innerHTML = `<div class="row spread"><div><h1>Learnings</h1><p class="sub">What the system learned from performance, and the rules it now injects into the strategist, writer and editor prompts.</p></div>
+    <div class="row"><select id="bsel" style="width:auto">${brands.map(b=>`<option value="${b.id}" ${b.id===bid?'selected':''}>${esc(b.name)}</option>`).join('')}</select>
+      <select id="plat" style="width:auto"><option value="all">All platforms</option>${Object.entries(PLAT).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select>
+      <button class="btn primary" id="run" data-testid="btn-learn">Run learning cycle</button></div></div>
+  <div class="grid cols-2">
+    <div class="card"><h2>Active rules (${active.length})</h2>${active.length? active.map(l=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div><span class="pill">${esc(l.applies_to)}</span> <span class="pill">${esc(l.platform)}</span> <span class="mono small muted">conf ${num(l.confidence,2)}</span></div>
+      <div style="margin-top:6px"><b>${esc(l.rule)}</b></div><div class="reason">Evidence: ${esc(l.insight)}</div>
+      <div class="bar" style="margin-top:6px"><i style="width:${Math.round(l.confidence*100)}%"></i></div></div>`).join('') : '<div class="empty">No learnings yet. Publish ≥2 pieces, record (or simulate) performance, then run a learning cycle.</div>'}</div>
+    <div class="card"><h2>Learning runs (${runs.length})</h2>${runs.map(r=>`<details ${r===runs[0]?'open':''}><summary>${fmt(r.created_at)} · ${esc(r.platform)} · ${r.pieces_analysed} pieces analysed</summary>
+      <div class="small" style="margin:8px 0">${esc(r.summary)}</div>
+      <table class="small"><thead><tr><th>Feature</th><th>Value → mean engagement (n)</th></tr></thead><tbody>${Object.entries(r.stats||{}).map(([f,t])=>`<tr><td class="mono">${esc(f)}</td><td class="mono">${Object.entries(t).map(([k,x])=>`${esc(k)}=${num(x.mean,2)} (${x.n})`).join(' · ')}</td></tr>`).join('')}</tbody></table></details>`).join('') || '<div class="muted small">No runs yet.</div>'}</div>
+  </div>
+  ${learnings.length>active.length? `<div class="card" style="margin-top:16px"><details><summary>Superseded rules (${learnings.length-active.length})</summary>${learnings.filter(l=>!l.active).map(l=>`<div class="small muted" style="padding:6px 0">${esc(l.rule)} <span class="mono">(${fmt(l.created_at)})</span></div>`).join('')}</details></div>`:''}`;
+  $('#bsel').addEventListener('change', e=>location.hash='#/learnings/'+e.target.value);
+  $('#run').addEventListener('click', async e=>{ e.target.disabled=true; e.target.innerHTML='<span class="spinner"></span> analysing…'; try{ const r=await api(`/brands/${bid}/learn`,{method:'POST',body:{platform:$('#plat').value}}); toast(`Learned from ${r.pieces_analysed} pieces`); routes.learnings([bid]); }catch(err){ toast(err.message,true); e.target.disabled=false; e.target.textContent='Run learning cycle'; } });
+};
+
+// --------------------------------------------------------------- decisions
+routes.decisions = async () => {
+  const v=$('#view'); v.innerHTML='<h1>Decision trail</h1><div class="spinner"></div>';
+  const list = await api('/decisions?limit=300');
+  const agents=[...new Set(list.map(d=>d.agent))];
+  v.innerHTML = `<div class="row spread"><div><h1>Decision trail</h1><p class="sub">Every important decision, who made it, why, and which piece it belongs to.</p></div>
+    <select id="agent" style="width:auto"><option value="">All agents</option>${agents.map(a=>`<option>${a}</option>`).join('')}</select></div>
+    <div class="card" id="tl">${timeline(list.map(d=>({...d, summary:(d.content_id?`[${d.content_id}] `:'')+d.summary}))) }</div>`;
+  $('#agent').addEventListener('change', e=>{ const f=list.filter(d=>!e.target.value||d.agent===e.target.value); $('#tl').innerHTML=timeline(f.map(d=>({...d, summary:(d.content_id?`[${d.content_id}] `:'')+d.summary}))); });
+  document.querySelectorAll('#tl li').forEach((li,i)=>{ const d=list[i]; if(d?.content_id){ li.style.cursor='pointer'; li.addEventListener('click',()=>location.hash='#/content/'+d.content_id);} });
+};
+
+// -------------------------------------------------------------------- boot
+api('/health').then(h=>{ $('#foot').innerHTML=`Mesh API · ${esc(h.chat_model)}<br>${h.mesh_mock?'<span style="color:var(--danger)">MOCK MODE (tests only)</span>':'live gateway'}`; }).catch(()=>{});
+nav();
+</script>
+</body>
+</html>

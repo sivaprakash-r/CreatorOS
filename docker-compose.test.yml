@@ -1,0 +1,15 @@
+# Runs the full offline test suite (unit + integration + Playwright UI) inside a container:
+#   docker compose -f docker-compose.test.yml run --rm tests
+services:
+  tests:
+    image: mcr.microsoft.com/playwright/python:v1.56.0-noble
+    working_dir: /src
+    volumes:
+      - .:/src
+    environment:
+      MESH_MOCK: "1"
+      MESH_API_KEY: ""
+    command: >
+      bash -c "pip install -q -r requirements.txt -r requirements-dev.txt &&
+               pytest tests/unit tests/integration -q &&
+               pytest tests/ui -q --browser chromium"

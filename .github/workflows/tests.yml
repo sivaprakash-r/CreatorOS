@@ -1,0 +1,19 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Unit + integration tests (offline, mock Mesh)
+        run: MESH_MOCK=1 pytest tests/unit tests/integration -q
+      - name: Install Playwright browser
+        run: playwright install --with-deps chromium
+      - name: UI tests (Playwright)
+        run: MESH_MOCK=1 pytest tests/ui -q --browser chromium
